@@ -1,0 +1,16 @@
+﻿  Bird.cpp
+  GameStateManager.cpp
+C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.h(40,34): warning C4244: 'return': conversion from 'const size_t' to 'float', possible loss of data
+  (compiling source file 'GameStateManager.cpp')
+  
+C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.cpp(20,22): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.cpp(65,70): warning C4244: 'argument': conversion from 'Sint32' to 'float', possible loss of data
+C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.cpp(65,50): warning C4244: 'argument': conversion from 'Sint32' to 'float', possible loss of data
+C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.cpp(100,19): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  flappybird.cpp
+C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.h(40,34): warning C4244: 'return': conversion from 'const size_t' to 'float', possible loss of data
+  (compiling source file 'flappybird.cpp')
+  
+C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\flappybird.cpp(155,44): warning C4244: 'argument': conversion from 'float' to 'size_t', possible loss of data
+  Generating Code...
+  FlappyBird.vcxproj -> C:\Users\Jacob\Source\Repos\GameMakerToolkit\x64\Debug\FlappyBird.exe
