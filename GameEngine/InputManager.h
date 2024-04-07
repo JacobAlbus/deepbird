@@ -11,11 +11,11 @@ public:
 
 	InputManager();
 
-	~InputManager();
-
 	void PressKey(unsigned int key_id);
 
 	void ReleaseKey(unsigned int key_id);
+
+	unsigned int AwaitInput() const;
 
 	bool IsKeyPressed(unsigned int key_id);
 

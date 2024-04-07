@@ -9,9 +9,8 @@
 #include <string>
 #include <iostream>
 
-FlappyBird::FlappyBird(int screen_width, int screen_height) : 
-	_screen_width(screen_width), 
-	_screen_height(screen_height),
+FlappyBird::FlappyBird(bool is_ai_controlled) : 
+	_IS_AI_CONTROLLED(is_ai_controlled),
 	_text_manager(),
 	_game_state_manager("Textures/jimmy_jump/PNG/bird.png", 
 						"Textures/jimmy_jump/PNG/pipe.png", 
@@ -33,12 +32,10 @@ void FlappyBird::GameLoop() {
 	while (_game_state_manager.IsPlaying()) {
 		_fps_limiter.Begin();
 
-		GameState prev_game_state = _game_state_manager.GetGameState();
+		_game_state_manager.UpdateCamera(_IS_AI_CONTROLLED);
+		_game_state_manager.UpdateState(_IS_AI_CONTROLLED);
 
-		_game_state_manager.UpdateCamera();
-		_game_state_manager.UpdateState();
-
-		UpdateTextBoxes(prev_game_state);
+		UpdateTextBoxes();
 
 		DrawGame();
 
@@ -117,7 +114,7 @@ void FlappyBird::DrawSprites() {
 void FlappyBird::InitSystems() {
 	GameEngine::init();
 
-	_window.Create("Flappy Bird", _screen_width, _screen_height, GameEngine::FULLSCREEN);
+	_window.Create("Flappy Bird", Consts::SCREEN_WIDTH, Consts::SCREEN_HEIGHT, GameEngine::FULLSCREEN);
 
 	InitShaders();
 
@@ -130,30 +127,28 @@ void FlappyBird::InitSystems() {
 								Consts::DEFAULT_COLOR,
 								Consts::TEXT_SPRITE_SHEET_MAPPER);
 
+	PrintInitInfo();
 	AddOpeningScreenText(0, Consts::MESSAGE_TEXT_SIZE);
 }
 
-void FlappyBird::UpdateTextBoxes(GameState prev_game_state) {
+void FlappyBird::UpdateTextBoxes() {
 	GameState current_game_state = _game_state_manager.GetGameState();
 
-	if (prev_game_state != current_game_state) {
-		_text_manager.ClearTextBoxes();
-	}
-
-	if (prev_game_state == GameState::PLAY && current_game_state == GameState::DEAD) {
+	_text_manager.ClearTextBoxes();
+	
+	if (current_game_state == GameState::DEAD) {
 		AddDeadPlayerText(0, Consts::MESSAGE_TEXT_SIZE);
 	}
 
-	if (prev_game_state == GameState::DEAD && current_game_state == GameState::OPENING_SCREEN) {
+	if (current_game_state == GameState::OPENING_SCREEN) {
 		AddOpeningScreenText(0, Consts::MESSAGE_TEXT_SIZE);
 	}
 
 	if (current_game_state == GameState::PLAY) {
-		float score = _game_state_manager.GetScore();
-
-		_text_manager.ClearTextBoxes();
-		AddScoreText(0, Consts::SCORE_TEXT_SIZE, score);
+		AddScoreText(0, Consts::SCORE_TEXT_SIZE, _game_state_manager.GetScore());
 	}
+
+	AddFrameCountText(0, Consts::SCORE_TEXT_SIZE, _game_state_manager.GetFrameCount());
 }
 
 void FlappyBird::AddDeadPlayerText(size_t spritesheet_index, float text_size) {
@@ -178,6 +173,29 @@ void FlappyBird::AddScoreText(size_t spritesheet_index, float text_size, size_t 
 							 Consts::SCORE_TEXT_POS,
 							 ss.str(),
 							 text_size);
+}
+
+void FlappyBird::PrintInitInfo() const {
+	std::cout << Consts::START_MESSAGE;
+
+	std::cout << "{";
+
+	std::cout << "\"max_height\": " << Consts::SCREEN_HEIGHT << ",";
+	std::cout << "\"max_width\": " << Consts::SCREEN_WIDTH - Consts::PLAYER_INITIAL_POSITION.x;
+
+	std::cout << "}";
+
+	std::cout << Consts::END_MESSAGE;
+}
+
+void FlappyBird::AddFrameCountText(size_t spritesheet_index, float text_size, size_t frame_count) {
+	std::stringstream ss;
+	ss << frame_count;
+
+	_text_manager.AddTextBox(spritesheet_index,
+		Consts::FRAME_COUNT_TEXT_POS,
+		ss.str(),
+		text_size);
 }
 
 void FlappyBird::InitShaders() {

@@ -17,7 +17,7 @@
 class FlappyBird {
 
 public:
-	FlappyBird(int screen_width, int screen_height);
+	FlappyBird(bool is_ai_controlled);
 	~FlappyBird();
 
 	void Run();
@@ -28,9 +28,11 @@ private:
 
 	void AddOpeningScreenText(size_t spritesheet_index, float text_size);
 
-	void UpdateTextBoxes(GameState prev_game_state);
+	void UpdateTextBoxes();
 
 	void AddScoreText(size_t spritesheet_index, float text_size, size_t score);
+
+	void AddFrameCountText(size_t spritesheet_index, float text_size, size_t frame_count);
 
 	void InitSystems();
 
@@ -42,10 +44,11 @@ private:
 
 	void DrawSprites();
 
+	void PrintInitInfo() const;
+
 	GameEngine::Window _window;
 
-	int _screen_width;
-	int _screen_height;
+	const bool _IS_AI_CONTROLLED;
 
 	GameStateManager _game_state_manager;
 	GameEngine::TextManager _text_manager;

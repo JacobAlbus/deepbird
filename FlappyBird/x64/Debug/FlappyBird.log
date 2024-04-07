@@ -1,16 +1,10 @@
 ﻿  Bird.cpp
+C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\FlappyBird\Bird.cpp(43,22): warning C4305: 'initializing': truncation from 'double' to 'float'
   GameStateManager.cpp
-C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.h(40,34): warning C4244: 'return': conversion from 'const size_t' to 'float', possible loss of data
-  (compiling source file 'GameStateManager.cpp')
-  
-C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.cpp(20,22): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.cpp(65,70): warning C4244: 'argument': conversion from 'Sint32' to 'float', possible loss of data
-C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.cpp(65,50): warning C4244: 'argument': conversion from 'Sint32' to 'float', possible loss of data
-C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.cpp(100,19): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\FlappyBird\GameStateManager.cpp(21,22): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Pipe.cpp
   flappybird.cpp
-C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\GameStateManager.h(40,34): warning C4244: 'return': conversion from 'const size_t' to 'float', possible loss of data
-  (compiling source file 'flappybird.cpp')
-  
-C:\Users\Jacob\Source\Repos\GameMakerToolkit\FlappyBird\flappybird.cpp(155,44): warning C4244: 'argument': conversion from 'float' to 'size_t', possible loss of data
+  main.cpp
   Generating Code...
-  FlappyBird.vcxproj -> C:\Users\Jacob\Source\Repos\GameMakerToolkit\x64\Debug\FlappyBird.exe
+C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\FlappyBird\Pipe.cpp(20): warning C4172: returning address of local variable or temporary: new_pipe
+  FlappyBird.vcxproj -> C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\x64\Debug\FlappyBird.exe

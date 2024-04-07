@@ -25,6 +25,8 @@ public:
 	// Keep player within screen boundaries
 	void PreventScreenClipping();
 
+	float GetVelocity() const { return _current_velocity; }
+
 private:
 
 	void UpdateVelocity(bool is_spacebar_pressed);

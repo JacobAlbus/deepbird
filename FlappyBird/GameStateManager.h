@@ -15,6 +15,12 @@ enum class GameState {
 	QUIT
 };
 
+enum class InputTypes {
+	JUMP,
+	NOTHING,
+	RESET
+};
+
 class GameStateManager {
 
 public:
@@ -27,9 +33,9 @@ public:
 
 	void ProcessInputs();
 
-	void UpdateCamera();
+	void UpdateCamera(bool is_ai_controlling);
 
-	void UpdateState();
+	void UpdateState(bool is_ai_controlling);
 
 	const GameEngine::Camera2D& GetCamera() const { return _camera; }
 
@@ -37,7 +43,9 @@ public:
 
 	const std::vector<Pipe>& GetPipes() const { return _pipes; }
 
-	float GetScore() const { return _score; }
+	size_t GetScore() const { return _score; }
+
+	size_t GetFrameCount() const { return _frame_count; }
 
 	GameState GetGameState() const { return _game_state; }
 
@@ -55,11 +63,17 @@ private:
 
 	void UpdateScore();
 
+	void PrintGameState() const;
+
 	bool IsPlayerColliding() const;
 
 	void DeletePipes();
 	void AddPipes();
 	void MovePipes();
+
+	float CalculatePipeDistance() const;
+
+	SDL_Keycode ConvertInputToKey(InputTypes input_type) const;
 
 	// Is the leading pipe in the middle of the screen
 	bool _is_leading_pipe_in_middle;
@@ -69,6 +83,8 @@ private:
 
 	// Is the player inbetween a pair of pipes (i.e. one vertical and one horizontal
 	bool _is_player_between_pipes;
+
+	size_t _frame_count;
 
 	GameState _game_state;
 	Bird _player;

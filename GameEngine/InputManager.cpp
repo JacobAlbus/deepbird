@@ -1,11 +1,9 @@
 #include "InputManager.h"
 
+#include <iostream>
+
 namespace GameEngine {
-	InputManager::InputManager() {
-
-	}
-
-	InputManager::~InputManager() {
+	InputManager::InputManager() : _mouse_coords(glm::vec2()) {
 
 	}
 
@@ -25,6 +23,12 @@ namespace GameEngine {
 		} else {
 			return false;
 		}
+	}
+
+	unsigned int InputManager::AwaitInput() const {
+		unsigned int input;
+		std::cin >> input;
+		return input;
 	}
 
 	void InputManager::SetMouseCoords(float x, float y) {

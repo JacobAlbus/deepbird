@@ -8,6 +8,7 @@ GameStateManager::GameStateManager(const std::string& bird_texture_path,
 								   const std::string& pipe_texture_path,
 								   const std::string& upside_down_pipe_texture_path) : 
 						 _game_state(GameState::OPENING_SCREEN),
+						 _frame_count(0),
 						 _score(0),
 						 _is_player_between_pipes(false),
 						 _is_leading_pipe_in_middle(false),
@@ -24,11 +25,21 @@ bool GameStateManager::IsPlaying() const {
 	return _game_state != GameState::QUIT;
 }
 
-void GameStateManager::UpdateCamera() {
+void GameStateManager::UpdateCamera(bool is_ai_controlling) {
 	_camera.Update();
 }
 
-void GameStateManager::UpdateState() {
+void GameStateManager::UpdateState(bool is_ai_controlling) {
+	SDL_Keycode key_id;
+	if (is_ai_controlling) {
+		unsigned int input = _input_manager.AwaitInput();
+		key_id = ConvertInputToKey(InputTypes(input));
+		_input_manager.PressKey(key_id);
+		PrintGameState();
+	}
+
+	_frame_count++;
+
 	ProcessInputs();
 
 	switch (_game_state) {
@@ -47,9 +58,12 @@ void GameStateManager::UpdateState() {
 			break;
 	}
 
-
 	if (IsPlayerColliding()) {
 		_game_state = GameState::DEAD;
+	}
+
+	if (is_ai_controlling) {
+		_input_manager.ReleaseKey(key_id);
 	}
 }
 
@@ -62,7 +76,7 @@ void GameStateManager::ProcessInputs() {
 			_game_state = GameState::QUIT;
 			break;
 		case SDL_MOUSEMOTION:
-			_input_manager.SetMouseCoords(sdl_event.motion.x, sdl_event.motion.y);
+			_input_manager.SetMouseCoords((float) sdl_event.motion.x, (float) sdl_event.motion.y);
 			break;
 		case SDL_KEYDOWN:
 			_input_manager.PressKey(sdl_event.key.keysym.sym);
@@ -97,7 +111,7 @@ void GameStateManager::AddPipes() {
 	glm::vec4 pipe1_initial_position(Consts::SCREEN_WIDTH - 1, 0, Consts::PIPE_WIDTH, pipe1_height);
 	_pipes.emplace_back(Consts::PIPE_TEXTURE_PATH, pipe1_initial_position, Consts::DEFAULT_COLOR);
 
-	int pipe2_height = pipe1_height + Consts::PIPE_DISTANCE;
+	float pipe2_height = pipe1_height + Consts::PIPE_DISTANCE;
 	glm::vec4 pipe2_initial_position(Consts::SCREEN_WIDTH - 1, pipe2_height, Consts::PIPE_WIDTH, Consts::SCREEN_HEIGHT - pipe2_height);
 	_pipes.emplace_back(Consts::UPSIDE_DOWN_PIPE_TEXTURE_PATH, pipe2_initial_position, Consts::DEFAULT_COLOR);
 }
@@ -194,4 +208,43 @@ void GameStateManager::UpdateScore() {
 	}
 
 	_is_player_between_pipes = _pipes[0].IsCoordBetweenX(_player.GetX1());
+}
+
+void GameStateManager::PrintGameState() const {
+	std::cout << Consts::START_MESSAGE;
+
+	std::cout << "{";
+
+	std::cout << "\"frame_count\": " << _frame_count << ", ";
+	std::cout << "\"player_height\": " << _player.GetY1() << ", ";
+	std::cout << "\"pipe_distance\": " << CalculatePipeDistance() << ", ";
+	std::cout << "\"player_velocity\": " << _player.GetVelocity();
+
+	std::cout << "}";
+
+	std::cout << Consts::END_MESSAGE;
+}
+
+float GameStateManager::CalculatePipeDistance() const {
+	if (_pipes.empty()) {
+		return Consts::SCREEN_WIDTH - Consts::PLAYER_INITIAL_POSITION.x;
+	}
+
+	// If player is past first pipe, take distance from next pipe;
+	if (_pipes[0].GetX2() < _player.GetX1()) {
+		return _pipes[2].GetX1() - _player.GetX2();
+	} else {
+		return _pipes[0].GetX1() - _player.GetX2();
+	}
+}
+
+SDL_Keycode GameStateManager::ConvertInputToKey(InputTypes input_type) const {
+	auto iterator = Consts::INPUT_TO_KEY.find(input_type);
+
+	// If found, return SDL key
+	if (iterator != Consts::INPUT_TO_KEY.end()) {
+		return iterator->second;
+	}
+
+	return SDL_KeyCode::SDLK_0;
 }

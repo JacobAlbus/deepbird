@@ -2,6 +2,7 @@
 
 #include <GameEngine/Vertex.h>
 #include <GameEngine/Sprite.h>
+#include "GameStateManager.h"
 #include <glm/glm.hpp>
 #include <string>
 
@@ -25,12 +26,21 @@ namespace Consts {
 	const std::string UPSIDE_DOWN_PIPE_TEXTURE_PATH = "Textures/jimmy_jump/PNG/upsidedown_pipe.png";
 	const int PIPE_HEIGHT_RANGE = (Consts::SCREEN_HEIGHT - Consts::MIN_PIPE_HEIGHT - Consts::PIPE_DISTANCE - Consts::MIN_PIPE_HEIGHT);
 
+	const std::string START_MESSAGE = "*!*!*";
+	const std::string END_MESSAGE = "!*!*!";
+
 	const float MESSAGE_TEXT_SIZE = 20.0f;
 	const float SCORE_TEXT_SIZE = 50.0f;
 
 	const glm::vec2 DEAD_PLAYER_TEXT_POS(0, Consts::SCREEN_HEIGHT - 100);
 	const glm::vec2 OPENING_TEXT_POS(0, Consts::SCREEN_HEIGHT - 100);
 	const glm::vec2 SCORE_TEXT_POS(SCREEN_WIDTH / 2, Consts::SCREEN_HEIGHT - 100);
+	const glm::vec2 FRAME_COUNT_TEXT_POS(0, 0);
+
+	const std::map<InputTypes, SDL_Keycode> INPUT_TO_KEY = {
+		{InputTypes::JUMP, SDL_KeyCode::SDLK_SPACE}, {InputTypes::NOTHING, SDL_KeyCode::SDLK_0}, 
+		{InputTypes::RESET, SDL_KeyCode::SDLK_q}
+	};
 
 	const std::map<char, glm::vec2> TEXT_SPRITE_SHEET_MAPPER = {
 		{'A', glm::vec2(0, 8)}, {'B', glm::vec2(1, 8)}, {'C', glm::vec2(2, 8)},

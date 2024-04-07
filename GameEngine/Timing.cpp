@@ -20,11 +20,11 @@ namespace GameEngine {
 	float FPSLimiter::End() {
 		float fps = CalculateFPS();
 		
-		static int frame_counter = 0;
+	/*	static int frame_counter = 0;
 		frame_counter = (frame_counter + 1) % 10;
 		if (frame_counter == 0) {
 			std::cout << fps << std::endl;
-		}
+		}*/
 
 		// limit fps to _max_fps
 		Uint32 frame_ticks = SDL_GetTicks() - _start_ticks;
