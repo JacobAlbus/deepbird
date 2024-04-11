@@ -41,7 +41,7 @@ void GameStateManager::UpdateState(bool is_ai_controlling) {
 	_frame_count++;
 
 	ProcessInputs();
-
+	 
 	switch (_game_state) {
 		case GameState::PLAY:
 			UpdatePlayer();
@@ -182,6 +182,9 @@ void GameStateManager::HandleDeadPlayer() {
 		_player.SetInitialPosition();
 		_game_state = GameState::OPENING_SCREEN;
 		_pipes.clear();
+		_is_player_between_pipes = false;
+		_is_leading_pipe_in_middle = false;
+		_is_second_pipe_in_middle = false;
 	}
 }
 
@@ -218,7 +221,8 @@ void GameStateManager::PrintGameState() const {
 	std::cout << "\"frame_count\": " << _frame_count << ", ";
 	std::cout << "\"player_height\": " << _player.GetY1() << ", ";
 	std::cout << "\"pipe_distance\": " << CalculatePipeDistance() << ", ";
-	std::cout << "\"player_velocity\": " << _player.GetVelocity();
+	std::cout << "\"player_velocity\": " << _player.GetVelocity() << ", ";
+	std::cout << "\"is_terminated\": " << IsPlayerColliding();
 
 	std::cout << "}";
 
@@ -226,15 +230,16 @@ void GameStateManager::PrintGameState() const {
 }
 
 float GameStateManager::CalculatePipeDistance() const {
+	// If no pipes, return distance from bird to edge of screen
 	if (_pipes.empty()) {
-		return Consts::SCREEN_WIDTH - Consts::PLAYER_INITIAL_POSITION.x;
+		return Consts::SCREEN_WIDTH - Consts::PLAYER_INITIAL_POSITION.x + Consts::PIPE_WIDTH;
 	}
 
 	// If player is past first pipe, take distance from next pipe;
 	if (_pipes[0].GetX2() < _player.GetX1()) {
-		return _pipes[2].GetX1() - _player.GetX2();
+		return _pipes[2].GetX2() - _player.GetX1();
 	} else {
-		return _pipes[0].GetX1() - _player.GetX2();
+		return _pipes[0].GetX2() - _player.GetX1();
 	}
 }
 

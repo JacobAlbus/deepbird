@@ -1,10 +1,5 @@
-﻿  Bird.cpp
-C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\FlappyBird\Bird.cpp(43,22): warning C4305: 'initializing': truncation from 'double' to 'float'
-  GameStateManager.cpp
+﻿  GameStateManager.cpp
 C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\FlappyBird\GameStateManager.cpp(21,22): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  Pipe.cpp
   flappybird.cpp
-  main.cpp
   Generating Code...
-C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\FlappyBird\Pipe.cpp(20): warning C4172: returning address of local variable or temporary: new_pipe
   FlappyBird.vcxproj -> C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\x64\Debug\FlappyBird.exe
