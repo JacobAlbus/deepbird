@@ -1,8 +1,9 @@
 #include "GameStateManager.h"
 #include <SDL/SDL.h>
-
-#include <iostream>
 #include "Constants.h"
+
+#include <algorithm>
+#include <iostream>
 
 GameStateManager::GameStateManager(const std::string& bird_texture_path, 
 								   const std::string& pipe_texture_path,
@@ -220,7 +221,8 @@ void GameStateManager::PrintGameState() const {
 
 	std::cout << "\"frame_count\": " << _frame_count << ", ";
 	std::cout << "\"player_height\": " << _player.GetY1() << ", ";
-	std::cout << "\"pipe_distance\": " << CalculatePipeDistance() << ", ";
+	std::cout << "\"pipe_distance\": " << std::min(CalculatePipeDistance(), Consts::MAX_PIPE_DISTANCE) << ", ";
+	std::cout << "\"pipe_height\": " << CalculatePipeHeight() << ", ";
 	std::cout << "\"player_velocity\": " << _player.GetVelocity() << ", ";
 	std::cout << "\"is_terminated\": " << IsPlayerColliding();
 
@@ -232,7 +234,7 @@ void GameStateManager::PrintGameState() const {
 float GameStateManager::CalculatePipeDistance() const {
 	// If no pipes, return distance from bird to edge of screen
 	if (_pipes.empty()) {
-		return Consts::SCREEN_WIDTH - Consts::PLAYER_INITIAL_POSITION.x + Consts::PIPE_WIDTH;
+		return Consts::MAX_PIPE_DISTANCE;
 	}
 
 	// If player is past first pipe, take distance from next pipe;
@@ -240,6 +242,20 @@ float GameStateManager::CalculatePipeDistance() const {
 		return _pipes[2].GetX2() - _player.GetX1();
 	} else {
 		return _pipes[0].GetX2() - _player.GetX1();
+	}
+}
+
+float GameStateManager::CalculatePipeHeight() const {
+	if (_pipes.empty()) {
+		return Consts::MIN_PIPE_HEIGHT;
+	}
+
+	// If player is past first pipe, take height of next pipe;
+	if (_pipes[0].GetX2() < _player.GetX1()) {
+		return _pipes[2].GetY2();
+	}
+	else {
+		return _pipes[0].GetY2();
 	}
 }
 

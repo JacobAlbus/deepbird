@@ -73,6 +73,8 @@ private:
 
 	float CalculatePipeDistance() const;
 
+	float CalculatePipeHeight() const;
+
 	SDL_Keycode ConvertInputToKey(InputTypes input_type) const;
 
 	// Is the leading pipe in the middle of the screen

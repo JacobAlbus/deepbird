@@ -1,3 +1,5 @@
+from space import Space
+
 import psutil, subprocess
 import json
 from collections import deque
@@ -6,7 +8,7 @@ import signal
 
 class GameEnv:
     
-  def __init__(self, exe_string: str, vert_divisons: int, hori_divisions: int, velo_divisions: int):
+  def __init__(self, exe_string: str, vert_divisons: int, hori_divisions: int, pipe_height_divisions: int, velo_divisions: int):
     """
     Parameters:
       exe_path -- command to run the game
@@ -43,11 +45,31 @@ class GameEnv:
     
     self.MIN_VELO = int(self.MIN_VELO)
 
+    self.VERT_DIVISIONS = vert_divisons
+    self.HORI_DIVSIONS = hori_divisions
+    self.PIPE_HEIGHT_DIVISIONS = pipe_height_divisions
+    self.VELO_VISIONS = velo_divisions
+
     # set intervals used for calcuating state
     max_velo = int(game_info["player_jump_velo"])
     self.VERT_INTERVAL = int(int(game_info["max_height"]) / vert_divisons)
     self.HORI_INTERVAL = int(int(game_info["max_width"]) / hori_divisions)
+    self.PIPE_HEIGHT_INTERVAL = int((game_info["max_pipe_height"] - game_info["min_pipe_height"]) / pipe_height_divisions)
     self.VELO_INTERVAL = int((max_velo + abs(self.MIN_VELO)) / velo_divisions)
+
+    self.MIN_PIPE_HEIGHT = game_info["min_pipe_height"]
+    print(game_info)
+    print(self.VERT_INTERVAL, self.HORI_INTERVAL, self.PIPE_HEIGHT_INTERVAL, self.VELO_INTERVAL)
+
+    print(self.MIN_VELO, max_velo)
+
+    # TODO: see if it would be better to adjust calculated state to be 'terminal' 
+    # (e.g. if `is_terminated == True` then make first state dimension equal to vert_divisions)
+    self.TERMINAL_STATE = (vert_divisons, hori_divisions, pipe_height_divisions, velo_divisions)
+
+    # define state and action spaces
+    state_space = Space(self.TERMINAL_STATE)
+    action_space = Space((1)) # only actions are 0 (jump) or 1 (nothing)
         
   def reset(self):
     """
@@ -81,24 +103,31 @@ class GameEnv:
 
     game_state = self.__read_message__()
 
-    height_state = int(game_state["player_height"] / self.VERT_INTERVAL)
-    width_state = int(game_state["pipe_distance"] / self.HORI_INTERVAL)
-    velo_state = int((game_state["player_velocity"] + abs(self.MIN_VELO)) / self.VELO_INTERVAL)
-    state = (height_state, width_state, velo_state)
+    # player_height_state = min(int(game_state["player_height"] / self.VERT_INTERVAL), self.VERT_DIVISIONS - 1)
+    # width_state = min(int(game_state["pipe_distance"] / self.HORI_INTERVAL), self.HORI_DIVSIONS - 1)
+    # pipe_height_state = min(int((game_state["pipe_height"] - self.MIN_PIPE_HEIGHT) / self.PIPE_HEIGHT_INTERVAL), self.PIPE_HEIGHT_DIVISIONS - 1)
+    # velo_state = min(int((game_state["player_velocity"] + abs(self.MIN_VELO)) / self.VELO_INTERVAL), self.VELO_VISIONS - 1)
+    # state = (height_state, width_state, pipe_height_state, velo_state)
 
-    reward = self.calculate_reward()
+    player_height_state = min(int(game_state["player_height"] / self.VERT_INTERVAL), self.VERT_DIVISIONS - 1)
+    pipe_height_state = min(int((game_state["pipe_height"] - self.MIN_PIPE_HEIGHT) / self.PIPE_HEIGHT_INTERVAL), self.PIPE_HEIGHT_DIVISIONS - 1)
+    state = (player_height_state, pipe_height_state)
+
+    reward = self.calculate_reward(state)
     is_terminated = game_state["is_terminated"]
 
+    if is_terminated:
+      return self.TERMINAL_STATE, reward, is_terminated
+    
     return state, reward, is_terminated
   
-  def calculate_reward(self) -> float:
+  def calculate_reward(self, state: tuple) -> float:
     return 0.5
   
   def __read_message__(self) -> dict:
     """
     Reads output of the game and looks for messages which start with START_MESSAGE_STR and end with END_MESSAGE_STR
     """
-
     # keep reading until we found start of message
     while self.__message_buffer_to_string__() != self.START_MESSAGE_STR:
       new_char = self.__get_next_char__()
@@ -123,14 +152,12 @@ class GameEnv:
     self.__empty_message_buffer__()
 
     message = "".join(message)
-    print(message)
     return json.loads(message)
 
   def end_game(self) -> None:
     """
     Ends the game (i.e. kills the proccess)
     """
-
     os.kill(self.process.pid, signal.SIGTERM)
 
   def __message_buffer_to_string__(self) -> str:

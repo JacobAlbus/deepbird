@@ -182,10 +182,12 @@ void FlappyBird::PrintInitInfo() const {
 
 	std::cout << "\"gravity\": " << Consts::GRAVITY << ",";
 	std::cout << "\"player_jump_velo\": " << Consts::JUMP_VELOCITY << ",";
+	std::cout << "\"max_pipe_height\": " << Consts::PIPE_HEIGHT_RANGE + Consts::MIN_PIPE_HEIGHT << ",";
+	std::cout << "\"min_pipe_height\": " << Consts::MIN_PIPE_HEIGHT << ",";
 	//std::cout << "\"end_message_string\": " << Consts::END_MESSAGE << ",";
 	//std::cout << "\"start_message_string\": " << Consts::START_MESSAGE << ",";
 	std::cout << "\"max_height\": " << Consts::SCREEN_HEIGHT << ",";
-	std::cout << "\"max_width\": " << Consts::SCREEN_WIDTH - Consts::PLAYER_INITIAL_POSITION.x + Consts::PIPE_WIDTH;
+	std::cout << "\"max_width\": " << Consts::SCREEN_WIDTH - Consts::PLAYER_INITIAL_POSITION.x;
 
 
 	std::cout << "}";

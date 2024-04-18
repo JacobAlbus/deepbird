@@ -18,6 +18,7 @@ namespace Consts {
 
 	const GameEngine::Color DEFAULT_COLOR(255, 255, 255, 255);
 
+	const float MAX_PIPE_DISTANCE = Consts::SCREEN_WIDTH - Consts::PLAYER_INITIAL_POSITION.x;
 	const int MIN_PIPE_HEIGHT = 150;
 	const float PIPE_SPEED = -3.0f;
 	const int PIPE_WIDTH = 120;
