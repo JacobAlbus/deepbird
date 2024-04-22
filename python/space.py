@@ -1,4 +1,4 @@
-import numpy as np
+import random 
 
 class Space:
 
@@ -6,7 +6,11 @@ class Space:
     self.shape = shape
 
   def sample(self):
-    pass
+    sample = []
+    for dimension in self.shape:
+      sample.append(random.randint(0, dimension - 1))
+    
+    return tuple(sample)
 
   def __iter__(self):
     self.iterator = [0] * len(self.shape)

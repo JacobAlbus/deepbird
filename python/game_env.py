@@ -8,7 +8,13 @@ import signal
 
 class GameEnv:
     
-  def __init__(self, exe_string: str, vert_divisons: int, hori_divisions: int, pipe_height_divisions: int, velo_divisions: int):
+  def __init__(self, 
+               exe_string: str, 
+               terminal_state: tuple,
+               vert_divisons: int,
+               hori_divisions: int, 
+               pipe_height_divisions: int, 
+               velo_divisions: int):
     """
     Parameters:
       exe_path -- command to run the game
@@ -65,7 +71,7 @@ class GameEnv:
 
     # TODO: see if it would be better to adjust calculated state to be 'terminal' 
     # (e.g. if `is_terminated == True` then make first state dimension equal to vert_divisions)
-    self.TERMINAL_STATE = (vert_divisons, hori_divisions, pipe_height_divisions, velo_divisions)
+    self.TERMINAL_STATE = terminal_state
 
     # define state and action spaces
     state_space = Space(self.TERMINAL_STATE)
@@ -102,7 +108,6 @@ class GameEnv:
     self.perform_action(action)
 
     game_state = self.__read_message__()
-
     # player_height_state = min(int(game_state["player_height"] / self.VERT_INTERVAL), self.VERT_DIVISIONS - 1)
     # width_state = min(int(game_state["pipe_distance"] / self.HORI_INTERVAL), self.HORI_DIVSIONS - 1)
     # pipe_height_state = min(int((game_state["pipe_height"] - self.MIN_PIPE_HEIGHT) / self.PIPE_HEIGHT_INTERVAL), self.PIPE_HEIGHT_DIVISIONS - 1)
@@ -110,8 +115,9 @@ class GameEnv:
     # state = (height_state, width_state, pipe_height_state, velo_state)
 
     player_height_state = min(int(game_state["player_height"] / self.VERT_INTERVAL), self.VERT_DIVISIONS - 1)
+    pipe_distance_state = min(int(game_state["pipe_distance"] / self.HORI_INTERVAL), self.HORI_DIVSIONS - 1)
     pipe_height_state = min(int((game_state["pipe_height"] - self.MIN_PIPE_HEIGHT) / self.PIPE_HEIGHT_INTERVAL), self.PIPE_HEIGHT_DIVISIONS - 1)
-    state = (player_height_state, pipe_height_state)
+    state = (player_height_state, pipe_height_state, pipe_distance_state)
 
     reward = self.calculate_reward(state)
     is_terminated = game_state["is_terminated"]
