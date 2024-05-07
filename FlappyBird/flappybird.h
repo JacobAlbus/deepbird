@@ -17,7 +17,7 @@
 class FlappyBird {
 
 public:
-	FlappyBird(bool is_ai_controlled);
+	FlappyBird(bool is_ai_controlled, bool is_display_screen);
 	~FlappyBird();
 
 	void Run();
@@ -49,6 +49,7 @@ private:
 	GameEngine::Window _window;
 
 	const bool _IS_AI_CONTROLLED;
+	const bool _IS_DISPLAY_SCREEN;
 
 	GameStateManager _game_state_manager;
 	GameEngine::TextManager _text_manager;

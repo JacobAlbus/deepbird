@@ -1,39 +1,22 @@
-from game_env import GameEnv
-from space import Space
+from td_sarsa import TdSarsa
 from dp_policy_iteration import PolicyIteration
 
-import json
-import random
-import time
-import sys
+# TD Sarsa train code
+model = TdSarsa("", False, 0.1, 0.9, 0.01)
+model.train()
 
-state_space = Space((120, 90, 60))
-terminal_state = (420, 420, 420)
+# TD Sarsa play code (playss the game with the given action value function)
+# model = TdSarsa("action_value_functions/action_value_function.json", True, 0.1, 0.9, 0.01)
+# model.play()
 
-# initial_policy = {}
-# for state in state_space:
-#   initial_policy[str(state)] = random.randint(0, 1)
+# Policy Iteration  training code
+# state_space = Space((120, 90, 60))
+# terminal_state = (999, 999, 999)
+# model = PolicyIteration(state_space, terminal_state, initial_policy, change_threshold=0.005, discount_factor=0.9)
+# model.train(epochs=101)
 
-# model = PolicyIteration(state_space, terminal_state, initial_policy, change_threshold=0.005, discount_factor=0.95)
-
-# model.train(epochs=100)
-
-with open('policies/policy_99.json') as json_file:
-    policy = json.load(json_file)
-
-cmd = r"../x64/Debug/FlappyBird.exe true"
-env = GameEnv(cmd, terminal_state=terminal_state, vert_divisons=120, hori_divisions=60,  pipe_height_divisions=90, velo_divisions=36)
-
-state, reward, is_terminated = env.step(0)
-
-for i in range(100000):
-  if is_terminated:
-    env.reset()
-    is_terminated = False
-    state, reward, is_terminated = env.step(0)
-  else:
-    action = policy[str(state)]
-    print(action, state)
-    state, reward, is_terminated = env.step(action)
-
-env.end_game()
+# Policy Iteration play code (playss the game with the given action value function)
+# state_space = Space((120, 90, 60))
+# terminal_state = (999, 999, 999)
+# model = PolicyIteration(state_space, terminal_state, initial_policy, change_threshold=0.005, discount_factor=0.9)
+# model.train(policy_path="policies/policy.json")

@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <cmath>
 
 GameStateManager::GameStateManager(const std::string& bird_texture_path, 
 								   const std::string& pipe_texture_path,
@@ -11,6 +12,7 @@ GameStateManager::GameStateManager(const std::string& bird_texture_path,
 						 _game_state(GameState::OPENING_SCREEN),
 						 _frame_count(0),
 						 _score(0),
+						 _high_score(0),
 						 _is_player_between_pipes(false),
 						 _is_leading_pipe_in_middle(false),
 						 _is_second_pipe_in_middle(false),
@@ -36,7 +38,6 @@ void GameStateManager::UpdateState(bool is_ai_controlling) {
 		unsigned int input = _input_manager.AwaitInput();
 		key_id = ConvertInputToKey(InputTypes(input));
 		_input_manager.PressKey(key_id);
-		PrintGameState();
 	}
 
 	_frame_count++;
@@ -65,6 +66,14 @@ void GameStateManager::UpdateState(bool is_ai_controlling) {
 
 	if (is_ai_controlling) {
 		_input_manager.ReleaseKey(key_id);
+	}
+
+	if (_score > _high_score) {
+		_high_score = _score;
+	}
+
+	if (is_ai_controlling) {
+		PrintGameState();
 	}
 }
 
@@ -192,6 +201,7 @@ void GameStateManager::HandleDeadPlayer() {
 void GameStateManager::HandleOpeningScreen() {
 	if (_input_manager.IsKeyPressed(SDLK_SPACE)) {
 		_game_state = GameState::PLAY;
+		UpdatePipes();
 	}
 }
 
@@ -224,11 +234,32 @@ void GameStateManager::PrintGameState() const {
 	std::cout << "\"pipe_distance\": " << std::min(CalculatePipeDistance(), Consts::MAX_PIPE_DISTANCE) << ", ";
 	std::cout << "\"pipe_height\": " << CalculatePipeHeight() << ", ";
 	std::cout << "\"player_velocity\": " << _player.GetVelocity() << ", ";
-	std::cout << "\"is_terminated\": " << IsPlayerColliding();
+	std::cout << "\"frame_count\": " << _frame_count << ", ";
+	std::cout << "\"score\": " << _score << ", ";
+	std::cout << "\"high_score\": " << _high_score << ", ";
+	std::cout << "\"reward\": " << CalculateReward() << ", ";
+	std::cout << "\"is_terminated\": " << (_game_state == GameState::DEAD);
 
 	std::cout << "}";
 
 	std::cout << Consts::END_MESSAGE;
+}
+
+float GameStateManager::CalculateReward() const {
+	if (_game_state == GameState::DEAD) {
+		return 0.0f;
+	} else if (_pipes.empty()) {
+		return 100.0f;
+	}
+
+	float reward = 100.0f;
+
+	// Penalize player for being far from in between pipes
+	float player_height = _player.GetY1();
+	float pipe_midpoint = (_pipes[0].GetY2() + _pipes[1].GetY1()) / 2;
+	reward -= 0.2f * std::abs(player_height - pipe_midpoint);
+
+	return reward;
 }
 
 float GameStateManager::CalculatePipeDistance() const {

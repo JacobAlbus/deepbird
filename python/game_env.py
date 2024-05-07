@@ -1,5 +1,4 @@
-from space import Space
-
+from time import perf_counter
 import psutil, subprocess
 import json
 from collections import deque
@@ -10,7 +9,6 @@ class GameEnv:
     
   def __init__(self, 
                exe_string: str, 
-               terminal_state: tuple,
                vert_divisons: int,
                hori_divisions: int, 
                pipe_height_divisions: int, 
@@ -35,6 +33,8 @@ class GameEnv:
 
     self.stdout_buffer = deque()
     self.__empty_message_buffer__()
+
+    self.START_TIME = perf_counter()
 
     game_info = self.__read_message__()
     
@@ -64,24 +64,12 @@ class GameEnv:
     self.VELO_INTERVAL = int((max_velo + abs(self.MIN_VELO)) / velo_divisions)
 
     self.MIN_PIPE_HEIGHT = game_info["min_pipe_height"]
-    print(game_info)
-    print(self.VERT_INTERVAL, self.HORI_INTERVAL, self.PIPE_HEIGHT_INTERVAL, self.VELO_INTERVAL)
 
-    print(self.MIN_VELO, max_velo)
-
-    # TODO: see if it would be better to adjust calculated state to be 'terminal' 
-    # (e.g. if `is_terminated == True` then make first state dimension equal to vert_divisions)
-    self.TERMINAL_STATE = terminal_state
-
-    # define state and action spaces
-    state_space = Space(self.TERMINAL_STATE)
-    action_space = Space((1)) # only actions are 0 (jump) or 1 (nothing)
-        
   def reset(self):
     """
     Tells the game to reset. Only works if the current run is terminated (i.e. the bird is dead)
     """
-    self.perform_action(2)    
+    return self.step(2)    
 
   def perform_action(self, action: int) -> None:
     """
@@ -108,28 +96,35 @@ class GameEnv:
     self.perform_action(action)
 
     game_state = self.__read_message__()
-    # player_height_state = min(int(game_state["player_height"] / self.VERT_INTERVAL), self.VERT_DIVISIONS - 1)
-    # width_state = min(int(game_state["pipe_distance"] / self.HORI_INTERVAL), self.HORI_DIVSIONS - 1)
-    # pipe_height_state = min(int((game_state["pipe_height"] - self.MIN_PIPE_HEIGHT) / self.PIPE_HEIGHT_INTERVAL), self.PIPE_HEIGHT_DIVISIONS - 1)
-    # velo_state = min(int((game_state["player_velocity"] + abs(self.MIN_VELO)) / self.VELO_INTERVAL), self.VELO_VISIONS - 1)
-    # state = (height_state, width_state, pipe_height_state, velo_state)
 
     player_height_state = min(int(game_state["player_height"] / self.VERT_INTERVAL), self.VERT_DIVISIONS - 1)
     pipe_distance_state = min(int(game_state["pipe_distance"] / self.HORI_INTERVAL), self.HORI_DIVSIONS - 1)
     pipe_height_state = min(int((game_state["pipe_height"] - self.MIN_PIPE_HEIGHT) / self.PIPE_HEIGHT_INTERVAL), self.PIPE_HEIGHT_DIVISIONS - 1)
     state = (player_height_state, pipe_height_state, pipe_distance_state)
 
-    reward = self.calculate_reward(state)
-    is_terminated = game_state["is_terminated"]
+    if game_state["frame_count"] % 1000000 == 0:
+      print(game_state["frame_count"], game_state["score"], game_state["high_score"], perf_counter() - self.START_TIME)
 
-    if is_terminated:
-      return self.TERMINAL_STATE, reward, is_terminated
+    is_terminated = game_state["is_terminated"]
+    # reward = game_state["reward"]
+    reward = self.calculate_reward(state, is_terminated)
     
     return state, reward, is_terminated
-  
-  def calculate_reward(self, state: tuple) -> float:
-    return 0.5
-  
+
+  def calculate_reward(self, state: tuple, is_terminated: bool) -> tuple:
+    if is_terminated:
+      return 0
+
+    reward = 100
+    # Penalize the player for being far from inbetween pipes
+    player_height = (state[0] * 8)
+    pipe1_height = (state[1] * 4) + 150
+    pipe2_height = pipe1_height + 300
+    pipe_midpoint = ((pipe1_height + pipe2_height) / 2) - 50
+    reward -= 0.2 * abs(player_height - pipe_midpoint)
+
+    return reward
+
   def __read_message__(self) -> dict:
     """
     Reads output of the game and looks for messages which start with START_MESSAGE_STR and end with END_MESSAGE_STR

@@ -2,13 +2,12 @@ import sys
 import json
 import time
 
-from collections import defaultdict
 from space import Space
-
+from game_env import GameEnv
 
 class PolicyIteration:
 
-  def __init__(self, state_space: Space, terminal_state: tuple, policy: dict, change_threshold: float, discount_factor: float):
+  def __init__(self, state_space: Space, terminal_state: tuple, change_threshold: float, discount_factor: float):
     self.DISCOUNT_FACTOR = discount_factor
     self.STATE_SPACE = state_space
     self.CHANGE_THRESHOLD = change_threshold
@@ -19,7 +18,10 @@ class PolicyIteration:
       self.value_function[str(state)] = 0
     self.value_function[str(self.TERMINAL_STATE)] = 0
 
-    self.policy = policy
+    self.policy = {}
+    for state in self.STATE_SPACE:
+      self.policy[str(state)] = 0
+    self.policy[str(self.TERMINAL_STATE)] = 0
 
   def train(self, epochs: int) -> None:
     for index in range(epochs):
@@ -31,14 +33,28 @@ class PolicyIteration:
 
       print(f"FINISHED Epoch {index}, Time: {time.time()-start_time}")
 
-      if index % 10 == 0:
-        with open(f"policies/policy_{index}.json", "w") as file:
-          json.dump(self.policy, file)
-        with open(f"policies/value_function_{index}.json", "w") as file:
-          json.dump(self.value_function, file)
-
-    with open(f"policies/policy_{index}.json", "w") as file:
+    with open(f"policies/policy.json", "w") as file:
       json.dump(self.policy, file)
+    with open(f"policies/value_function.json", "w") as file:
+      json.dump(self.value_function, file)
+
+  def play(self, policy_path: str):
+    cmd = r"../x64/Debug/FlappyBird.exe true true"
+    self.env = GameEnv(cmd, vert_divisons=120, hori_divisions=60,  pipe_height_divisions=90, velo_divisions=36)
+
+    with open(policy_path) as json_file:
+        policy = json.load(json_file)
+
+    while True:
+      # initialize state and choose initial action
+      prev_state, _, is_terminated = self.env.step('0')
+      action = policy[prev_state]
+
+      while not is_terminated:
+        state, _, is_terminated = self.env.step(action)
+        action = policy[state]
+
+      self.env.reset()
 
   def policy_evaluation(self, num_epoch: int):
     max_change = sys.maxsize
@@ -94,22 +110,46 @@ class PolicyIteration:
   # TODO: calculate reward using game_env's calculate reward function
   def calculate_reward(self, state: tuple) -> tuple:
     if state == self.TERMINAL_STATE:
-      return -100
-    
-    # Check if player is between pipes
-    player_height = state[0] * 8
+      return 0
+
+    # reward signal 1
+    # player_height = (state[0] * 8)
+    # pipe1_height = (state[1] * 4) + 150
+    # pipe2_height = pipe1_height + 300
+    # pipe_distance = state[2] * 8
+    # if ((player_height > (pipe1_height + 10)) and 
+    #     (player_height < (pipe2_height - 60)) and
+    #     (pipe_distance < 200)):
+    #   return 50
+
+    # return 1
+
+    # reward signal 2
+    # player_height = (state[0] * 8)
+    # pipe1_height = (state[1] * 4) + 150
+    # pipe2_height = pipe1_height + 300
+    # pipe_distance = state[2] * 8
+    # if ((player_height > (pipe1_height + 10)) and 
+    #     (player_height < (pipe2_height - 60)) and
+    #     (pipe_distance < 200)):
+    #   return 50
+
+    # reward = 40
+    # if (player_height < pipe1_height):
+    #   reward -= 0.2 * abs(player_height - pipe2_height)
+    # elif player_height > (pipe2_height - 60):
+    #   reward -= abs(player_height + 60 - pipe2_height)
+
+    # return reward
+
+    # reward signal 3
+    reward = 100
+    # Penalize the player for being far from inbetween pipes
+    player_height = (state[0] * 8)
     pipe1_height = (state[1] * 4) + 150
     pipe2_height = pipe1_height + 300
-    pipe_distance = state[2] * 8
-    if pipe_distance < 200 and (player_height - 10) > pipe1_height and (player_height + 70) < pipe2_height:
-      return 50
-    
-    # Penalize  player for not being level with pipe opening
-    reward = 40
-    if player_height < pipe1_height:
-      reward -= 0.1 * (pipe1_height + 10 - player_height)
-    elif player_height + 70 > pipe2_height:
-      reward -= 0.1 * (player_height + 80 - pipe2_height)
+    pipe_midpoint = ((pipe1_height + pipe2_height) / 2) - 50
+    reward -= 0.2 * abs(player_height - pipe_midpoint)
 
     return reward
 

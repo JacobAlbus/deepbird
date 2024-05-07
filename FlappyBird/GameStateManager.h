@@ -65,6 +65,8 @@ private:
 
 	void PrintGameState() const;
 
+	float CalculateReward() const;
+
 	bool IsPlayerColliding() const;
 
 	void DeletePipes();
@@ -87,6 +89,7 @@ private:
 	bool _is_player_between_pipes;
 
 	size_t _frame_count;
+	size_t _high_score;
 
 	GameState _game_state;
 	Bird _player;
