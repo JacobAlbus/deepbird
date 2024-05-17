@@ -109,7 +109,7 @@ class GameEnv:
     # reward = game_state["reward"]
     reward = self.calculate_reward(state, is_terminated)
     
-    return state, reward, is_terminated
+    return state, reward, is_terminated, game_state
 
   def calculate_reward(self, state: tuple, is_terminated: bool) -> tuple:
     if is_terminated:

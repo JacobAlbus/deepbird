@@ -22,12 +22,12 @@ void Bird::SetInitialPosition() {
 }
 
 void Bird::UpdatePosition(GameEngine::InputManager input_manager) {
-	//if (input_manager.IsKeyPressed(SDLK_w)) {
-	//	_position.y += Consts::JUMP_VELOCITY;
-	//}
-	//if (input_manager.IsKeyPressed(SDLK_s)) {
-	//	_position.y -= Consts::JUMP_VELOCITY;
-	//}
+	/*if (input_manager.IsKeyPressed(SDLK_w)) {
+		_position.y += Consts::JUMP_VELOCITY;
+	}
+	if (input_manager.IsKeyPressed(SDLK_s)) {
+		_position.y -= Consts::JUMP_VELOCITY;
+	}*/
 
 	UpdateVelocity(input_manager.IsKeyPressed(SDLK_SPACE));
 	_position.y += _current_velocity;
