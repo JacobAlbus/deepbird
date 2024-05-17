@@ -24,7 +24,7 @@ class TdSarsaFrame:
     self.options_tracker.trace_add("write", self.set_td_sarsa)
 
     # Paths to action value function file
-    self.continue_from_prev_file_path = tk.StringVar(value="./action_value_functions/action_value_function_1874.json")
+    self.continue_from_prev_file_path = tk.StringVar(value="./action_value_functions/action_value_function_1800.json")
     self.watch_model_play_file_path = tk.StringVar(value="./action_value_functions/action_value_function.json")
 
     self.width = width

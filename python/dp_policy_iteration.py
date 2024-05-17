@@ -107,40 +107,9 @@ class PolicyIteration:
 
     return tuple(next_state)
 
-  # TODO: calculate reward using game_env's calculate reward function
   def calculate_reward(self, state: tuple) -> tuple:
     if state == self.TERMINAL_STATE:
       return 0
-
-    # reward signal 1
-    # player_height = (state[0] * 8)
-    # pipe1_height = (state[1] * 4) + 150
-    # pipe2_height = pipe1_height + 300
-    # pipe_distance = state[2] * 8
-    # if ((player_height > (pipe1_height + 10)) and 
-    #     (player_height < (pipe2_height - 60)) and
-    #     (pipe_distance < 200)):
-    #   return 50
-
-    # return 1
-
-    # reward signal 2
-    # player_height = (state[0] * 8)
-    # pipe1_height = (state[1] * 4) + 150
-    # pipe2_height = pipe1_height + 300
-    # pipe_distance = state[2] * 8
-    # if ((player_height > (pipe1_height + 10)) and 
-    #     (player_height < (pipe2_height - 60)) and
-    #     (pipe_distance < 200)):
-    #   return 50
-
-    # reward = 40
-    # if (player_height < pipe1_height):
-    #   reward -= 0.2 * abs(player_height - pipe2_height)
-    # elif player_height > (pipe2_height - 60):
-    #   reward -= abs(player_height + 60 - pipe2_height)
-
-    # return reward
 
     # reward signal 3
     reward = 100
