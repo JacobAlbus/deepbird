@@ -87,7 +87,6 @@ class PolicyIteration:
 
     next_state[2] = max(next_state[2] - 2, 0)
 
-    # TODO: make more modular
     # update player_height state
     if action == 0:
       next_state[0] = min(next_state[0] + 1, self.STATE_SPACE.shape[0] - 1)

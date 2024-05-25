@@ -102,11 +102,7 @@ class GameEnv:
     pipe_height_state = min(int((game_state["pipe_height"] - self.MIN_PIPE_HEIGHT) / self.PIPE_HEIGHT_INTERVAL), self.PIPE_HEIGHT_DIVISIONS - 1)
     state = (player_height_state, pipe_height_state, pipe_distance_state)
 
-    if game_state["frame_count"] % 1000000 == 0:
-      print(game_state["frame_count"], game_state["score"], game_state["high_score"], perf_counter() - self.START_TIME)
-
     is_terminated = game_state["is_terminated"]
-    # reward = game_state["reward"]
     reward = self.calculate_reward(state, is_terminated)
     
     return state, reward, is_terminated, game_state

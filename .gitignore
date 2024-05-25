@@ -1,6 +1,7 @@
 .vs
 .git
 python/policies/
+python/des_action_value_functions/
 python/action_value_functions/
 python/td_sarsa_statistics/
 python/.ipynb_checkpoints/
