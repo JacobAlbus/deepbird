@@ -86,19 +86,19 @@ class TdSarsaFrame:
     play_button.grid(row=1, column=1, pady=10)
 
   def start_train(self):
-    model = TdSarsa("", use_starting_value_function=False, alpha=0.1, gamma=0.9, epsilon=0.05)
-    model.train()
+    model = TdSarsa("", use_starting_value_function=False,  n_steps=5, alpha=0.25, gamma=0.9, epsilon=0.05)
+    model.train(0)
 
   def continue_train(self):
     model_number = int(self.continue_from_prev_model_number.get())
-    starting_action_value_function_path = f"./action_value_functions/action_value_function_{model_number}.json"
-    model = TdSarsa(starting_action_value_function_path, use_starting_value_function=True, alpha=0.1, gamma=0.9, epsilon=0.01)
+    starting_action_value_function_path = f"./td_sarsa_functions3/action_value_function_{model_number}.json"
+    model = TdSarsa(starting_action_value_function_path, use_starting_value_function=True, n_steps=5, alpha=0.1, gamma=0.9, epsilon=0.01)
     model.train(model_number)
 
   def watch_play(self):
     model_number = int(self.watch_model_play_model_number.get())
-    starting_action_value_function_path = f"./action_value_functions/action_value_function_{model_number}.json"
-    model = TdSarsa(starting_action_value_function_path, use_starting_value_function=True, alpha=0.1, gamma=0.9, epsilon=0.01)
+    starting_action_value_function_path = f"./td_sarsa_functions3/action_value_function_{model_number}.json"
+    model = TdSarsa(starting_action_value_function_path, use_starting_value_function=True, n_steps=5, alpha=0.1, gamma=0.9, epsilon=0)
     model.play()
 
   def get_main_frame(self):

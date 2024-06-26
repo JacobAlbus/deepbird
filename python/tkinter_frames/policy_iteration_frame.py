@@ -25,7 +25,7 @@ class PolicyIterationFrame:
     self.options_tracker.trace_add("write", self.set_td_sarsa)
 
     # Paths to action value function file
-    self.watch_model_play_file_path = tk.StringVar(value="./action_value_functions/action_value_function.json")
+    self.watch_model_play_file_path = tk.StringVar(value="./policies/policy_3.json")
 
     self.width = width
     self.height = height
@@ -63,16 +63,17 @@ class PolicyIterationFrame:
     play_button.grid(row=1, column=1, pady=10)
 
   def start_train(self):
-    state_space = Space((120, 90, 60))
-    terminal_state = (999, 999, 999)
-    model = PolicyIteration(state_space, terminal_state, change_threshold=0.005, discount_factor=0.9)
+    state_space = Space((960, 360))
+    terminal_state = (999, 999)
+    model = PolicyIteration(state_space, terminal_state, change_threshold=0.0005, discount_factor=0.9)
     model.train(epochs=101)
 
   def watch_play(self):
-    state_space = Space((120, 90, 60))
-    terminal_state = (999, 999, 999)
+    state_space = Space((960, 360))
+    terminal_state = (999, 999)
     model = PolicyIteration(state_space, terminal_state, change_threshold=0.005, discount_factor=0.9)
-    model.train(policy_path="policies/policy.json")
+    policy_path = self.watch_model_play_file_path.get()
+    model.play(policy_path=policy_path)
 
   def get_main_frame(self):
     return self.main_frame

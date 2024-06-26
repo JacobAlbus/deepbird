@@ -33,9 +33,9 @@ class PolicyIteration:
 
       print(f"FINISHED Epoch {index}, Time: {time.time()-start_time}")
 
-    with open(f"policies/policy.json", "w") as file:
+    with open(f"policies/policy4.json", "w") as file:
       json.dump(self.policy, file)
-    with open(f"policies/value_function.json", "w") as file:
+    with open(f"policies/value_function4.json", "w") as file:
       json.dump(self.value_function, file)
 
   def play(self, policy_path: str):
@@ -47,12 +47,12 @@ class PolicyIteration:
 
     while True:
       # initialize state and choose initial action
-      prev_state, _, is_terminated = self.env.step('0')
-      action = policy[prev_state]
+      prev_state, _, is_terminated, _ = self.env.step('0')
+      action = policy[str(prev_state)]
 
       while not is_terminated:
-        state, _, is_terminated = self.env.step(action)
-        action = policy[state]
+        state, _, is_terminated, _ = self.env.step(action)
+        action = policy[str(state)]
 
       self.env.reset()
 
@@ -85,23 +85,12 @@ class PolicyIteration:
   def calculate_next_state(self, current_state: tuple, action: int) -> tuple:
     next_state = list(current_state)
 
-    next_state[2] = max(next_state[2] - 2, 0)
-
-    # update player_height state
     if action == 0:
       next_state[0] = min(next_state[0] + 1, self.STATE_SPACE.shape[0] - 1)
     else:
       next_state[0] = max(next_state[0] - 3, 0)
 
     if next_state[0] <= 0:
-      return self.TERMINAL_STATE 
-
-    # Check if we hit terminal state (i.e. player dies)
-    player_height = next_state[0] * 8
-    pipe1_height = (next_state[1] * 4) + 150
-    pipe2_height = pipe1_height + 300
-    pipe_distance = next_state[2] * 8
-    if pipe_distance < 200 and ((player_height <= pipe1_height) or (player_height + 60 >= pipe2_height)):
       return self.TERMINAL_STATE 
 
     return tuple(next_state)
@@ -132,7 +121,7 @@ class PolicyIteration:
         old_action = self.policy[str(state)]
 
         max_action = -1
-        max_value = -sys.maxsize
+        max_value = -sys.maxsizea
         for action in range(2):
           next_state = self.calculate_next_state(state, action)
           expected_value = self.calculate_reward(next_state) + (self.DISCOUNT_FACTOR * self.value_function[str(next_state)])

@@ -54,14 +54,14 @@ class GameEnv:
     self.VERT_DIVISIONS = vert_divisons
     self.HORI_DIVSIONS = hori_divisions
     self.PIPE_HEIGHT_DIVISIONS = pipe_height_divisions
-    self.VELO_VISIONS = velo_divisions
+    self.VELO_DIVISIONS = velo_divisions
 
     # set intervals used for calcuating state
     max_velo = int(game_info["player_jump_velo"])
     self.VERT_INTERVAL = int(int(game_info["max_height"]) / vert_divisons)
     self.HORI_INTERVAL = int(int(game_info["max_width"]) / hori_divisions)
     self.PIPE_HEIGHT_INTERVAL = int((game_info["max_pipe_height"] - game_info["min_pipe_height"]) / pipe_height_divisions)
-    self.VELO_INTERVAL = int((max_velo + abs(self.MIN_VELO)) / velo_divisions)
+    self.VELO_INTERVAL = (max_velo + abs(self.MIN_VELO)) / velo_divisions
 
     self.MIN_PIPE_HEIGHT = game_info["min_pipe_height"]
 
@@ -98,28 +98,14 @@ class GameEnv:
     game_state = self.__read_message__()
 
     player_height_state = min(int(game_state["player_height"] / self.VERT_INTERVAL), self.VERT_DIVISIONS - 1)
-    pipe_distance_state = min(int(game_state["pipe_distance"] / self.HORI_INTERVAL), self.HORI_DIVSIONS - 1)
     pipe_height_state = min(int((game_state["pipe_height"] - self.MIN_PIPE_HEIGHT) / self.PIPE_HEIGHT_INTERVAL), self.PIPE_HEIGHT_DIVISIONS - 1)
+    pipe_distance_state = min(int(game_state["pipe_distance"] / self.HORI_INTERVAL), self.HORI_DIVSIONS - 1)
     state = (player_height_state, pipe_height_state, pipe_distance_state)
 
     is_terminated = game_state["is_terminated"]
-    reward = self.calculate_reward(state, is_terminated)
+    reward = game_state["reward"]
     
     return state, reward, is_terminated, game_state
-
-  def calculate_reward(self, state: tuple, is_terminated: bool) -> tuple:
-    if is_terminated:
-      return 0
-
-    reward = 100
-    # Penalize the player for being far from inbetween pipes
-    player_height = (state[0] * 8)
-    pipe1_height = (state[1] * 4) + 150
-    pipe2_height = pipe1_height + 300
-    pipe_midpoint = ((pipe1_height + pipe2_height) / 2) - 50
-    reward -= 0.2 * abs(player_height - pipe_midpoint)
-
-    return reward
 
   def __read_message__(self) -> dict:
     """

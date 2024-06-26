@@ -1,21 +1,22 @@
 from game_env import GameEnv
 from space import Space
-from collections import defaultdict
-from pathlib import Path
+from time import perf_counter
 
 import random
 import json
 
 class DoubleExpectedSarsa:
 
-  def __init__(self, start_function_path: str, use_starting_value_function: bool, alpha: float, gamma: float, epsilon: float):
+  def __init__(self, prev_model_number: int, use_starting_value_function: bool, alpha: float, gamma: float, epsilon: float):
     self.alpha = alpha
     self.gamma = gamma
     self.epsilon = epsilon
 
     if use_starting_value_function:
-      with open(start_function_path) as json_file:
-        self.action_value_function = json.load(json_file)
+      with open(f"./des_action_value_functions3/action_value_function_a_{prev_model_number}.json") as json_file:
+        self.action_value_function_a = json.load(json_file)
+      with open(f"./des_action_value_functions3/action_value_function_b_{prev_model_number}.json") as json_file:
+        self.action_value_function_b = json.load(json_file)
     else:
       state_space = Space((120, 90, 60))
       self.action_value_function_a = {}
@@ -50,13 +51,16 @@ class DoubleExpectedSarsa:
 
   def train(self, starting_save_count: int):
     cmd = r"../x64/Debug/FlappyBird.exe true false"
-    self.env = GameEnv(cmd, vert_divisons=120, hori_divisions=60,  pipe_height_divisions=90, velo_divisions=36)
+    self.env = GameEnv(cmd, vert_divisons=120, hori_divisions=60,  pipe_height_divisions=90, velo_divisions=216)
 
     frame_count = 0
     save_count = starting_save_count
 
     average_score = 0
     high_score = 0
+    game_count = 0
+
+    start_time = perf_counter()
 
     while True:
 
@@ -66,7 +70,6 @@ class DoubleExpectedSarsa:
       prev_action, _, _ = self.policy(prev_state)
 
       update_function_a = True
-      game_count = 0
 
       while not is_terminated:
         # perform action
@@ -104,12 +107,31 @@ class DoubleExpectedSarsa:
       self.env.reset()
 
       if frame_count > 1000000:
+        print(f"Writing model #{save_count}, time elapsed: {perf_counter() - start_time}")
+        print(f"Played {game_count: _} games, average score of {average_score}, high score of {high_score}")
         frame_count = 0
         save_count += 1
-        print(f"Played for {frame_count: _} frames and {game_count: _} games, average score of {average_score}, high score of {high_score}")
-        with open(f"des_action_value_functions/action_value_function_a_{save_count}.json", "w") as file:
+        game_count = 0
+        average_score = 0
+        high_score = 0
+        with open(f"des_action_value_functions3/action_value_function_a_{save_count}.json", "w") as file:
             json.dump(self.action_value_function_a, file)
-        with open(f"des_action_value_functions/action_value_function_b_{save_count}.json", "w") as file:
+        with open(f"des_action_value_functions3/action_value_function_b_{save_count}.json", "w") as file:
             json.dump(self.action_value_function_b, file)
 
-    
+  def play(self):
+    cmd = r"../x64/Debug/FlappyBird.exe true true"
+    self.env = GameEnv(cmd, vert_divisons=960, hori_divisions=60,  pipe_height_divisions=360, velo_divisions=36)
+    self.epsilon = 0
+
+    while True:
+
+      # initialize state and choose initial action
+      prev_state, _, is_terminated, _ = self.env.step('0')
+      action, _, _ = self.policy(str(prev_state))
+
+      while not is_terminated:
+        state, _, is_terminated, _ = self.env.step(action)
+        action, _, _ = self.policy(str(state))
+
+      self.env.reset()

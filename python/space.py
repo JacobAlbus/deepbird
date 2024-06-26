@@ -17,9 +17,9 @@ class Space:
     return self 
 
   def __next__(self) -> tuple:
+    x = self.iterator.copy()
     self.__update_next_dimension__(len(self.shape) - 1)
 
-    x = self.iterator
     return tuple(x)
   
   def __update_next_dimension__(self, dimension_index: int) -> None:
