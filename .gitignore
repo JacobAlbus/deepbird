@@ -2,7 +2,12 @@
 .git
 python/policies/
 python/des_action_value_functions/
-python/action_value_functions/
+python/des_action_value_functions2/
+python/des_action_value_functions3/
+python/td_sarsa_functions/
+python/td_sarsa_functions2/
+python/td_sarsa_functions3/
 python/td_sarsa_statistics/
+python/td_sarsa_statistics3/
 python/.ipynb_checkpoints/
 **/__pycache__/

@@ -40,7 +40,7 @@ void Bird::UpdateVelocity(bool is_spacebar_pressed) {
 		_current_velocity = Consts::JUMP_VELOCITY;
 	} else {
 		//float elapsed_time = _timer.GetElapsedTime();
-		float elapsed_time = 0.016667;
+		float elapsed_time = 0.016667f;
 		_current_velocity -= elapsed_time * Consts::GRAVITY;
 	}
 }

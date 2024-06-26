@@ -22,6 +22,7 @@ GameStateManager::GameStateManager(const std::string& bird_texture_path,
 
 	_camera.Init(Consts::SCREEN_WIDTH, Consts::SCREEN_HEIGHT);
 	std::srand(std::time(nullptr)); // use current time as seed for random generator
+	UpdatePipes();
 }
 
 bool GameStateManager::IsPlaying() const {
@@ -43,6 +44,7 @@ void GameStateManager::UpdateState(bool is_ai_controlling) {
 	_frame_count++;
 
 	ProcessInputs();
+	CalculateReward();
 	 
 	switch (_game_state) {
 		case GameState::PLAY:
@@ -170,7 +172,6 @@ bool GameStateManager::ShouldAddPipes() {
 	if (_is_second_pipe_in_middle && !_pipes[2].IsCoordBetweenX(Consts::SCREEN_WIDTH / 2)) {
 		should_add = true;
 	}
-
 	_is_second_pipe_in_middle = _pipes[2].IsCoordBetweenX(Consts::SCREEN_WIDTH / 2);
 
 	return should_add;
@@ -195,6 +196,7 @@ void GameStateManager::HandleDeadPlayer() {
 		_is_player_between_pipes = false;
 		_is_leading_pipe_in_middle = false;
 		_is_second_pipe_in_middle = false;
+		UpdatePipes();
 	}
 }
 
@@ -218,7 +220,7 @@ void GameStateManager::UpdateScore() {
 
 	// If player was between pipes, but not anymore, then player has passed pipes
 	if (_is_player_between_pipes && !_pipes[0].IsCoordBetweenX(_player.GetX1())) {
-		_score += 1;
+  		_score += 1;
 	}
 
 	_is_player_between_pipes = _pipes[0].IsCoordBetweenX(_player.GetX1());
@@ -248,18 +250,24 @@ void GameStateManager::PrintGameState() const {
 float GameStateManager::CalculateReward() const {
 	if (_game_state == GameState::DEAD) {
 		return 0.0f;
-	} else if (_pipes.empty()) {
-		return 100.0f;
 	}
 
 	float reward = 100.0f;
 
 	// Penalize player for being far from in between pipes
 	float player_height = _player.GetY1();
-	float pipe_midpoint = (_pipes[0].GetY2() + _pipes[1].GetY1()) / 2;
-	reward -= 0.2f * std::abs(player_height - pipe_midpoint);
 
-	return reward;
+	float pipe_midpoint;
+	if (_pipes[0].GetX2() < _player.GetX1()) {
+		pipe_midpoint = (_pipes[2].GetY2() + _pipes[3].GetY1()) / 2;
+	}
+	else {
+		pipe_midpoint = (_pipes[0].GetY2() + _pipes[1].GetY1()) / 2;
+	}
+
+	reward -= 2.0f * std::abs(player_height - pipe_midpoint);
+
+	return std::max(reward, 0.0f);
 }
 
 float GameStateManager::CalculatePipeDistance() const {

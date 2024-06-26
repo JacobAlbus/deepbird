@@ -1,2 +1,20 @@
-﻿  InputManager.cpp
+﻿  Camera2D.cpp
+  GameEngine.cpp
+  GLSLProgram.cpp
+  ImageLoader.cpp
+  InputManager.cpp
+  IOManager.cpp
+C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\GameEngine\IOManager.cpp(19,17): warning C4244: 'initializing': conversion from 'std::streamoff' to 'int', possible loss of data
+C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\GameEngine\IOManager.cpp(24,26): warning C4244: '-=': conversion from 'std::streamoff' to 'int', possible loss of data
+  picoPng.cpp
+  ResourceManager.cpp
+  SpriteBatch.cpp
+C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\GameEngine\SpriteBatch.cpp(92,17): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+  Spritesheet.cpp
+  TextBox.cpp
+  TextManager.cpp
+  TextureCache.cpp
+  Timing.cpp
+  Window.cpp
+  Generating Code...
   GameEngine.vcxproj -> C:\Users\Jacob\Documents\Visual Studio 2022\deepbird\x64\Debug\GameEngine.lib

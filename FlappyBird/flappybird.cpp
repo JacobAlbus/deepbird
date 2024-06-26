@@ -190,7 +190,7 @@ void FlappyBird::PrintInitInfo() const {
 	std::cout << "\"max_pipe_height\": " << Consts::PIPE_HEIGHT_RANGE + Consts::MIN_PIPE_HEIGHT << ",";
 	std::cout << "\"min_pipe_height\": " << Consts::MIN_PIPE_HEIGHT << ",";
 	std::cout << "\"max_height\": " << Consts::SCREEN_HEIGHT << ",";
-	std::cout << "\"max_width\": " << Consts::SCREEN_WIDTH - Consts::PLAYER_INITIAL_POSITION.x;
+	std::cout << "\"max_width\": " << Consts::MAX_PIPE_DISTANCE;
 
 	std::cout << "}";
 
